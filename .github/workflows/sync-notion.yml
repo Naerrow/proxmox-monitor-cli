@@ -1,0 +1,37 @@
+name: Sync README to Notion
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "README.md"
+      - "scripts/sync-notion.js"
+      - ".github/workflows/sync-notion.yml"
+
+jobs:
+  sync-notion:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install @notionhq/client
+
+      - name: Sync README to Notion
+        run: node scripts/sync-notion.js
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
