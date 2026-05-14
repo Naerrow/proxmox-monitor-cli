@@ -119,8 +119,8 @@ function normalizeVisibility(value) {
 }
 
 function normalizeStatus(repo) {
-  if (repo.archived) return "보관";
-  if (repo.disabled) return "중단";
+  if (repo.archived) return "운영 종료";
+  if (repo.disabled) return "보류";
   return "운영 중";
 }
 
@@ -137,7 +137,7 @@ function inferRole(language) {
     return "Backend";
   }
 
-  return "Project";
+  return "Owner";
 }
 
 function getReadme() {
@@ -379,39 +379,44 @@ function makeProperties(titlePropertyName, repo) {
 
   const properties = {
     [titlePropertyName]: {
+      type: "title",
       title: richText(repo.name),
     },
   };
 
   properties["공개여부"] = {
+    type: "select",
     select: {
       name: normalizeVisibility(repo.visibility),
     },
   };
 
   properties["기간"] = {
+    type: "date",
     date: {
       start: repo.created_at ? repo.created_at.slice(0, 10) : null,
     },
   };
 
   properties["링크"] = {
+    type: "url",
     url: repo.html_url || null,
   };
 
   properties["상태"] = {
+    type: "select",
     select: {
       name: normalizeStatus(repo),
     },
   };
 
   properties["언어"] = {
-    multi_select: {
-      name: language,
-    },
+    type: "multi_select",
+    multi_select: [{ name: language }],
   };
 
   properties["역할"] = {
+    type: "select",
     select: {
       name: inferRole(language),
     },
@@ -578,6 +583,7 @@ async function createPageInDataSource(dataSourceId, properties, children) {
     },
     body: JSON.stringify({
       parent: {
+        type: "data_source_id",
         data_source_id: dataSourceId,
       },
       properties,
