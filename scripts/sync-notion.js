@@ -439,17 +439,16 @@ function buildAutoBlocks(repo, readme) {
     paragraph(`설명: ${repo.description || "-"}`),
     paragraph(`주요 언어: ${repo.language || "-"}`),
     paragraph(`공개 여부: ${normalizeVisibility(repo.visibility)}`),
-    paragraph(
+        paragraph(
       `생성일: ${repo.created_at ? repo.created_at.slice(0, 10) : "-"}`,
     ),
     paragraph(
       `최근 수정일: ${repo.updated_at ? repo.updated_at.slice(0, 10) : "-"}`,
     ),
-
-    heading2("README 기반 초안"),
-    paragraph("아래 영역은 GitHub README.md를 기준으로 자동 생성됩니다."),
-
-    ...markdownToBlocks(readme),
+    divider(),
+    heading2("📎 README"),
+    paragraph(`GitHub README에서 자세한 내용을 확인하세요.`),
+    paragraph(`${repo.html_url}#readme`),
 
     divider(),
     paragraph(AUTO_END),
