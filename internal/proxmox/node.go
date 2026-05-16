@@ -1,5 +1,7 @@
 package proxmox
 
+import "fmt"
+
 type Node struct {
 	Node   string  `json:"node"`
 	Status string  `json:"status"`
@@ -10,4 +12,10 @@ type Node struct {
 	Uptime int64   `json:"uptime"`
 }
 
-// TODO: GetNodes() 구현 예정
+func (c *Client) GetNodes() ([]Node, error) {
+	var nodes []Node
+	if err := c.get("/nodes", &nodes); err != nil {
+		return nil, fmt.Errorf("노드 목록 조회 실패: %w", err)
+	}
+	return nodes, nil
+}
