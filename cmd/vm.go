@@ -1,8 +1,13 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
 
+	"github.com/naerrow/proxmox-monitor-cli/config"
+	"github.com/naerrow/proxmox-monitor-cli/internal/proxmox"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +21,18 @@ var vmStartCmd = &cobra.Command{
 	Short: "VM 시작",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("TODO: VM %s 시작 구현 예정\n", args[0])
+		cfg := config.Load()
+		client := proxmox.NewClient(cfg.ProxmoxURL, cfg.ProxmoxToken, cfg.ProxmoxNode)
+
+		vmid := args[0]
+		fmt.Printf("🚀 VM %s 시작 중...\n", vmid)
+
+		if err := client.StartVM(vmid); err != nil {
+			fmt.Println("❌ 오류:", err)
+			os.Exit(1)
+		}
+
+		fmt.Printf("✅ VM %s 시작 완료\n", vmid)
 	},
 }
 
@@ -25,7 +41,18 @@ var vmStopCmd = &cobra.Command{
 	Short: "VM 중지",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("TODO: VM %s 중지 구현 예정\n", args[0])
+		cfg := config.Load()
+		client := proxmox.NewClient(cfg.ProxmoxURL, cfg.ProxmoxToken, cfg.ProxmoxNode)
+
+		vmid := args[0]
+		fmt.Printf("🛑 VM %s 중지 중...\n", vmid)
+
+		if err := client.StopVM(vmid); err != nil {
+			fmt.Println("❌ 오류:", err)
+			os.Exit(1)
+		}
+
+		fmt.Printf("✅ VM %s 중지 완료\n", vmid)
 	},
 }
 
@@ -34,7 +61,29 @@ var vmDeleteCmd = &cobra.Command{
 	Short: "VM 삭제",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("TODO: VM %s 삭제 구현 예정\n", args[0])
+		cfg := config.Load()
+		client := proxmox.NewClient(cfg.ProxmoxURL, cfg.ProxmoxToken, cfg.ProxmoxNode)
+
+		vmid := args[0]
+
+		fmt.Printf("⚠️  VM %s 를 정말 삭제할까요? (yes/no): ", vmid)
+		reader := bufio.NewReader(os.Stdin)
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+
+		if input != "yes" {
+			fmt.Println("❌ 삭제 취소")
+			return
+		}
+
+		fmt.Printf("🗑️  VM %s 삭제 중...\n", vmid)
+
+		if err := client.DeleteVM(vmid); err != nil {
+			fmt.Println("❌ 오류:", err)
+			os.Exit(1)
+		}
+
+		fmt.Printf("✅ VM %s 삭제 완료\n", vmid)
 	},
 }
 
